@@ -37,6 +37,14 @@
 @property (nonatomic) CGFloat infiniteScrollIndicatorMargin;
 
 /**
+ *  Flag indicating whether the content insets should be automatically adjusted when the infinite scroll
+ *  starts and stops loading. This is useful when setting up your own content insets on a scroll view.
+ *
+ *  Default is YES.
+ */
+@property (nonatomic) BOOL shouldAdjustContentInset;
+
+/**
  *  Setup infinite scroll handler
  *
  *  @param handler a handler block

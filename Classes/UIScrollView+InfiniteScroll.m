@@ -79,6 +79,12 @@ static const void *kPBInfiniteScrollStateKey = &kPBInfiniteScrollStateKey;
 @property CGFloat indicatorMargin;
 
 /**
+ *  Flag indicating whether the content inset should be automatically adjusted when
+ *  the infinite scroll starts and stops.
+ */
+@property BOOL shouldAdjustContentInset;
+
+/**
  *  Infinite scroll handler block
  */
 @property (copy) void(^infiniteScrollHandler)(id scrollView);
@@ -93,6 +99,8 @@ static const void *kPBInfiniteScrollStateKey = &kPBInfiniteScrollStateKey;
         
         // Default row height (44) minus activity indicator height (22) / 2
         _indicatorMargin = 11;
+        
+        _shouldAdjustContentInset = YES;
     }
     return self;
 }
@@ -199,6 +207,14 @@ static const void *kPBInfiniteScrollStateKey = &kPBInfiniteScrollStateKey;
 
 - (CGFloat)infiniteScrollIndicatorMargin {
     return self.pb_infiniteScrollState.indicatorMargin;
+}
+
+- (void)setShouldAdjustContentInset:(BOOL)shouldAdjustContentInset {
+    self.pb_infiniteScrollState.shouldAdjustContentInset = shouldAdjustContentInset;
+}
+
+- (BOOL)shouldAdjustContentInset {
+    return self.pb_infiniteScrollState.shouldAdjustContentInset;
 }
 
 #pragma mark - Private dynamic properties
@@ -366,6 +382,10 @@ static const void *kPBInfiniteScrollStateKey = &kPBInfiniteScrollStateKey;
         [activityIndicator performSelector:@selector(startAnimating) withObject:nil];
     }
     
+    if (!self.shouldAdjustContentInset) {
+        return;
+    }
+    
     // Calculate indicator view inset
     CGFloat indicatorInset = [self pb_infiniteIndicatorRowHeight];
     
@@ -407,24 +427,10 @@ static const void *kPBInfiniteScrollStateKey = &kPBInfiniteScrollStateKey;
  *  @param handler a completion handler
  */
 - (void)pb_stopAnimatingInfiniteScrollWithCompletion:(void(^)(id scrollView))handler {
-    _PBInfiniteScrollState *state = self.pb_infiniteScrollState;
     UIView *activityIndicator = self.infiniteScrollIndicatorView;
-    UIEdgeInsets contentInset = self.contentInset;
-    
-    // Remove row height inset
-    contentInset.bottom -= state.indicatorInset;
-    
-    // Remove extra inset added to pad infinite scroll
-    contentInset.bottom -= state.extraBottomInset;
-    
-    // Reset indicator view inset
-    state.indicatorInset = 0;
-    
-    // Reset extra bottom inset
-    state.extraBottomInset = 0;
-    
-    // Animate content insets
-    [self pb_setScrollViewContentInset:contentInset animated:YES completion:^(BOOL finished) {
+    _PBInfiniteScrollState *state = self.pb_infiniteScrollState;
+
+    void(^completion)(BOOL) = ^(BOOL finished) {
         // Curtain is closing they're throwing roses at my feet
         if([activityIndicator respondsToSelector:@selector(stopAnimating)]) {
             [activityIndicator performSelector:@selector(stopAnimating) withObject:nil];
@@ -449,7 +455,30 @@ static const void *kPBInfiniteScrollStateKey = &kPBInfiniteScrollStateKey;
         if(handler) {
             handler(self);
         }
-    }];
+    };
+
+    
+    if (!self.shouldAdjustContentInset) {
+        completion(YES);
+        return;
+    }
+
+    UIEdgeInsets contentInset = self.contentInset;
+    
+    // Remove row height inset
+    contentInset.bottom -= state.indicatorInset;
+    
+    // Remove extra inset added to pad infinite scroll
+    contentInset.bottom -= state.extraBottomInset;
+    
+    // Reset indicator view inset
+    state.indicatorInset = 0;
+    
+    // Reset extra bottom inset
+    state.extraBottomInset = 0;
+    
+    // Animate content insets
+    [self pb_setScrollViewContentInset:contentInset animated:YES completion:completion];
     
     TRACE(@"Stop animating.");
 }
