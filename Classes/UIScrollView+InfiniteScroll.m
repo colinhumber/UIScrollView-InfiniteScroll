@@ -382,6 +382,9 @@ static const void *kPBInfiniteScrollStateKey = &kPBInfiniteScrollStateKey;
         [activityIndicator performSelector:@selector(startAnimating) withObject:nil];
     }
     
+    // Update infinite scroll state
+    state.loading = YES;
+
     if (!self.shouldAdjustContentInset) {
         return;
     }
@@ -407,9 +410,6 @@ static const void *kPBInfiniteScrollStateKey = &kPBInfiniteScrollStateKey;
     
     // Save extra inset
     state.extraBottomInset = extraBottomInset;
-    
-    // Update infinite scroll state
-    state.loading = YES;
     
     // Animate content insets
     [self pb_setScrollViewContentInset:contentInset animated:YES completion:^(BOOL finished) {
