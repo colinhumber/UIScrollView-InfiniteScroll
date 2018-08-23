@@ -255,7 +255,7 @@ static const void *kPBInfiniteScrollStateKey = &kPBInfiniteScrollStateKey;
 /**
  *  This is a swizzled proxy method for setContentOffset of UIScrollView.
  *
- *  @param contentOffset
+ *  @param contentOffset The content offset to set.
  */
 - (void)pb_setContentOffset:(CGPoint)contentOffset {
     [self pb_setContentOffset:contentOffset];
@@ -268,7 +268,7 @@ static const void *kPBInfiniteScrollStateKey = &kPBInfiniteScrollStateKey;
 /**
  *  This is a swizzled proxy method for setContentSize of UIScrollView
  *
- *  @param contentSize <#contentSize description#>
+ *  @param contentSize The content size to set.
  */
 - (void)pb_setContentSize:(CGSize)contentSize {
     [self pb_setContentSize:contentSize];
