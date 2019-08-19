@@ -244,7 +244,7 @@ static const void *kPBInfiniteScrollStateKey = &kPBInfiniteScrollStateKey;
 /**
  *  Additional pan gesture handler used to adjust content offset to reveal or hide indicator view.
  *
- *  @param gestureRecognizer
+ *  @param gestureRecognizer The gesture recognizer that triggered the pan.
  */
 - (void)pb_handlePanGesture:(UITapGestureRecognizer*)gestureRecognizer {
     if(gestureRecognizer.state == UIGestureRecognizerStateEnded) {
